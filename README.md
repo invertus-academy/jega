@@ -1,2 +1,1 @@
 # jega
-Komandos dalyviai:
