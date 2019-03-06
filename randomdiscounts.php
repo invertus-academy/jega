@@ -10,27 +10,13 @@ class RandomDiscounts extends Module
         $this->author = 'PrestaShop';
         $this->tab = 'front_office_features';
         $this->version = '1.0.0';
-
         parent::__construct();
-
         $this->displayName = $this->l('Random Discounts');
         $this->description = $this->l('Module that randomizes discounts for you');
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
-
     }
-
     public function install()
     {
-<<<<<<< HEAD
-        $link = "Create table if not EXISTS "._DB_PREFIX_."Random_discounts(
-             `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-            `id_something` int(11) unsigned NOT NULL,
-             PRIMARY KEY (`id`)
-             )";
-            // Run sql for creating DB tables
-            Db::getInstance()->execute($link);
-        return parent::install() && $this->registerHook('displayHome');
-=======
         $this->createTable();
         return parent::install() &&
             $this->registerHook('displayHome') &&
@@ -48,8 +34,7 @@ class RandomDiscounts extends Module
                 `id_spec_price` int(11) NOT NULL,
                 PRIMARY KEY(`id_random_discount`)
                 )";
-       Db::getInstance()->execute($sql_Query);
-
+        Db::getInstance()->execute($sql_Query);
     }
     public function deleteTable()
     {
@@ -76,44 +61,13 @@ class RandomDiscounts extends Module
                 'class_name'=> 'AdminRandomDiscountsConfiguration',
             ]
         ];
->>>>>>> d22ff6147637df2a2bc3a0c261991a48e5fdbba2
     }
-
     public function hookDisplayHome()
     {
         return '<h1> Hello World </h1>';
     }
-<<<<<<< HEAD
-
-    public function getContent()
-    {
-       $link =Context::getContext()->link->getAdminLink('AdminRandomDiscountsConfiguration');
-       Tools::redirectAdmin($link);
-    }
-
-    public function getTabs()
-    {
-        return [
-            [
-                'name' => 'randomdiscounts',
-                'parent_class_name' => 'AdminParentModules',
-                'class_name' => 'AdminRandomDiscountsParent',
-                'visible' => false,
-            ],
-            [
-                'name' => 'Configuration',
-                'parent_class_name' => 'AdminRandomDiscountsParent',
-                'class_name' => 'AdminRandomDiscountsConfiguration',
-            ]
-
-        ];
-
-    }
-
-=======
     public function hookDisplayTop()
     {
         return '<a href="/Presta/lt/6-accessories">Nuolaidos</a>';
     }
->>>>>>> d22ff6147637df2a2bc3a0c261991a48e5fdbba2
 }
