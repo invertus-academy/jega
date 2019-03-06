@@ -17,9 +17,7 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
             $dateT = $_POST['date_to'];
             $randomedCat = $this->getRandomCategories($categories);
             $randomedItems = $this->getRandomItems($randomedCat, $items);
-//            echo '<pre>' ,var_dump($this->getCategoryItems(9)) , '</pre>';
-//            ;
-//            echo '<pre>' ,var_dump($randomedItems) , '</pre>';
+
         }
     }
     public function renderOptions()
@@ -132,7 +130,6 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
     }
     private function getRandomItems($randomedCategories, $selectedCount)
     {
-        $tempArr = array();
         $result = array();
 
         foreach ($randomedCategories as $single) {
@@ -156,11 +153,6 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
                     $temp = $temp + 1;
                 }
             }
-//            $randArr = array_rand($list, $selectedCount);
-//            for($i = 0; $i <$selectedCount; $i++) {
-//                $result[$temp][$i] = $list[$randArr[$i]];
-//            }
-//            $temp = $temp + 1;
         }
         return $result;
     }
