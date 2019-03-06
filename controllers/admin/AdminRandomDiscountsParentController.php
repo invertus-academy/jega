@@ -1,5 +1,5 @@
 <?php
-class AdminRandomDiscountsParent extends ModuleAdminController
+class AdminRandomDiscountsParentController extends ModuleAdminController
 {
 
 }
