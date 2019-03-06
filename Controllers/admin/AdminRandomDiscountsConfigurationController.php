@@ -6,11 +6,7 @@
  * Time: 6:29 PM
  */
 
-class AdminrandomdiscountsController extends ModuleAdminController
+class AdminRandomDiscountsConfigurationController extends ModuleAdminController
 {
-    public function  __construct()
-        {
-            parent::__construct();
-            die("Hello WOrld");
-        }
+
 }

@@ -2,7 +2,7 @@
 if (!defined('_PS_VERSION_')) {
     exit;
 }
-class randomdiscounts extends Module
+class RandomDiscounts extends Module
 {
     public function __construct()
     {
@@ -34,6 +34,31 @@ class randomdiscounts extends Module
     public function hookDisplayHome()
     {
         return '<h1> Hello World </h1>';
+    }
+
+    public function getContent()
+    {
+       $link =Context::getContext()->link->getAdminLink('AdminRandomDiscountsConfiguration');
+       Tools::redirectAdmin($link);
+    }
+
+    public function getTabs()
+    {
+        return [
+            [
+                'name' => 'randomdiscounts',
+                'parent_class_name' => 'AdminParentModules',
+                'class_name' => 'AdminRandomDiscountsParent',
+                'visible' => false,
+            ],
+            [
+                'name' => 'Configuration',
+                'parent_class_name' => 'AdminRandomDiscountsParent',
+                'class_name' => 'AdminRandomDiscountsConfiguration',
+            ]
+
+        ];
+
     }
 
 }
