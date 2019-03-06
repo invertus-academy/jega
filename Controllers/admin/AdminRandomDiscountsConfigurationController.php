@@ -31,8 +31,8 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
                         'label' => 'Prekių kiekis(per Kategorija)',
                         'name' => 'type_select',
                         'options' => array(
-                            'query' => Zone::getZones(),
-                            'id' => 'id_zone',
+                            'query' => $this::getItemsSelectArray(),
+                            'id' => 'id',
                             'name' => 'name',
                         ),
                     ),
@@ -54,5 +54,32 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
         );
 
         return parent::renderForm();
+    }
+
+    private function getRandomCategId($number)
+    {
+
+    }
+
+    private function getItemsCount()
+    {
+        $querry = "SELECT Count(id_product) as kiekis FROM `ps_product`";
+        $numb = Db::getInstance()->executeS($querry);
+        return $numb[0]["kiekis"];
+    }
+
+    private function getItemsSelectArray()
+    {
+        $num = $this::getItemsCount();
+        $result = array();
+        $item = 0;
+        for ($i = 0;$i < 5; $i++)
+        {
+            $item = $item +5;
+            $result[$i]["id"] = $i+1;
+            $result[$i]["name"] = $item;
+        }
+
+        return $result;
     }
 }
