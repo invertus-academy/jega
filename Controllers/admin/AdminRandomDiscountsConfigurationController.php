@@ -17,6 +17,16 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
             $dateT = $_POST['date_to'];
             $randomedCat = $this->getRandomCategories($categories);
             $randomedItems = $this->getRandomItems($randomedCat, $items);
+//            Atsispausdint Itemus kategoriju
+//            foreach ($randomedItems as $key=>$val)
+//            {
+//                for($i = 0; $i < count($randomedItems[$key]);$i++)
+//                {
+//                    echo $randomedItems[$key][$i]."\n";
+//                }
+//                echo "- - - - -";
+//            }
+//            die();
 
         }
     }
@@ -115,9 +125,14 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
     {
         $result = array();
         $categories = $this->getCategCount();
-        for($i = 0; $i < $selectedCountCat; $i++)
-        {
-            $result[$i] = rand(4, $categories);
+        $i = 0;
+       while(count($result) != $selectedCountCat)
+       {
+            $rand = rand(4, $categories);
+            if(!in_array($rand,$result)) {
+                $result[$i] = $rand;
+                $i= $i + 1;
+            }
         }
         return $result;
     }
@@ -131,28 +146,35 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
     private function getRandomItems($randomedCategories, $selectedCount)
     {
         $result = array();
-
+        $temp1 = 0;
+//        var_dump($randomedCategories);
+//        echo "pasibaigia ten rodo jau kita \n";
         foreach ($randomedCategories as $single) {
-            $list = $this->getCategoryItems(8);
+            $list = $this->getCategoryItems($single);
             if (count($list) > $selectedCount) {
                     //sukame cikla, kol bus uzpilyta skirtingom reiksmem reikiamas kiekis masyve
                     $i =0;
                     while (count($result) != $selectedCount) {
                         $temp = array_rand($list);
                         //Jeigu sugalvoto random skaiciaus dar nera prideje i masyva tuomet ji pridedam, kad nebutu vienodu produktu.
-                        if (!in_array($list[$temp]['produktai'], $result)) {
-                            $result[$i] = $list[$temp]['produktai'];
+                        if (!in_array($list[$temp]['produktai'], $result[$temp1])) {
+                            $result[$temp1][$i] = $list[$temp]['produktai'];
                             $i = $i + 1;
                         }
                     }
-            } else {
+            } else if (count($list) != 0){
 //                Jeigu Itemu yra maziau negu pasirinko vartotojas, tuomet sudedame visus itemus
                 $temp = 0;
                 foreach ($list as $val) {
-                    $result[$temp] = $val['produktai'];
+                    $result[$temp1][$temp] = $val['produktai'];
                     $temp = $temp + 1;
                 }
+            } else
+            {
+                $result[$temp1][0] = 0;
             }
+
+            $temp1 = $temp1 + 1;
         }
         return $result;
     }
