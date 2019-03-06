@@ -11,7 +11,18 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
     {
         if(isset($_POST["submitAddconfiguration"]))
         {
-            var_dump($_POST['nuolaida']);
+            $discount = $_POST['nuolaida'];
+            $categories = $_POST['categ'];
+            $items = $_POST['prekes'];
+            $dateF = $_POST['date_from'];
+            $dateT = $_POST['date_to'];
+
+            $randomedCat = $this->getRandomCategories($categories);
+            echo '<pre>' ,var_dump($randomedCat) , '</pre>';
+
+            echo '<pre>' ,var_dump($this->getCategoryItems(9)) , '</pre>';
+            $randomedItems = $this->getRandomItems($randomedCat, $items);
+            echo '<pre>' ,var_dump($randomedItems) , '</pre>';
             die();
         }
     }
@@ -77,7 +88,9 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
 //    }
     private function getCategCount()
     {
-        $querry = "SELECT Count(id_category) as kiekis FROM `ps_category`";
+        $querry = "SELECT Count(id_category) as kiekis FROM `ps_category` 
+                   WHERE id_category != 1
+                   AND id_category != 2";
         $kiek = Db::getInstance()->executeS($querry);
         return $kiek[0]["kiekis"];
     }
@@ -101,6 +114,39 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
             $item = $item +5;
             $result[$i]["id"] = $i+1;
             $result[$i]["name"] = $item;
+        }
+        return $result;
+    }
+    private function getRandomCategories($selectedCountCat)
+    {
+        $result = array();
+        $categories = $this->getCategCount();
+        for($i = 0; $i < $selectedCountCat; $i++)
+        {
+            $result[$i] = rand(3, $categories);
+        }
+        return $result;
+    }
+
+    private function getCategoryItems($category)
+    {
+        $querry = "SELECT id_product as produktai FROM `ps_product` 
+                   WHERE id_category_default = $category";
+        $result = Db::getInstance()->executeS($querry);
+        return $result;
+    }
+    private function getRandomItems($randomedCategories, $selectedCount)
+    {
+        $result = array(array());
+        $temp = 0;
+        foreach ($randomedCategories as $single)
+        {
+            $list = $this->getCategoryItems($single);
+            $randArr = array_rand($list, $selectedCount);
+            for($i = 0; $i <$selectedCount; $i++) {
+                $result[$temp][$i] = $list[$randArr[$i]];
+            }
+            $temp = $temp + 1;
         }
         return $result;
     }
