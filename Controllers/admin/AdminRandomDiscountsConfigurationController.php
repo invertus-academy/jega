@@ -8,6 +8,15 @@
 
 class AdminRandomDiscountsConfigurationController extends ModuleAdminController
 {
+    public function postProcess()
+    {
+       if(isset($_POST["submitAddconfiguration"]))
+       {
+           var_dump($_POST['nuolaida']);
+           die();
+       }
+    }
+
     public function renderOptions()
     {
         $this->fields_form = array(
@@ -19,7 +28,7 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
                     array(
                     'type' => 'select',
                     'label' => 'Kategorijų kiekis:',
-                    'name' => 'type_select',
+                    'name' => 'categ',
                     'options' => array(
                         'query' => $this->getCategSelectArray(),
                         'id' => 'id',
@@ -29,7 +38,7 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
                     array(
                         'type' => 'select',
                         'label' => 'Prekių kiekis(per Kategorija)',
-                        'name' => 'type_select',
+                        'name' => 'prekes',
                         'options' => array(
                             'query' => $this::getItemsSelectArray(),
                             'id' => 'id',
@@ -56,12 +65,13 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
 
     }
 
-    private function getItemsCount()
-    {
-        $querry = "SELECT Count(id_product) as kiekis FROM `ps_product`";
-        $numb = Db::getInstance()->executeS($querry);
-        return $numb[0]["kiekis"];
-    }
+
+//    private function getItemsCount()
+//    {
+//        $querry = "SELECT Count(id_product) as kiekis FROM `ps_product`";
+//        $numb = Db::getInstance()->executeS($querry);
+//        return $numb[0]["kiekis"];
+//    }
     private function getCategCount()
     {
         $querry = "SELECT Count(id_category) as kiekis FROM `ps_category`";
@@ -84,7 +94,6 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
 
     private function getItemsSelectArray()
     {
-        $num = $this::getItemsCount();
         $result = array();
         $item = 0;
         for ($i = 0;$i < 5; $i++)
@@ -93,7 +102,6 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
             $result[$i]["id"] = $i+1;
             $result[$i]["name"] = $item;
         }
-
         return $result;
     }
 }
