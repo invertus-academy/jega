@@ -37,14 +37,9 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
                         ),
                     ),
                 array(
-                    'type' => 'select',
+                    'type' => 'text',
                     'label' => 'Nuolaida (%)',
-                    'name' => 'type_select',
-                    'options' => array(
-                        'query' => Zone::getZones(),
-                        'id' => 'id_zone',
-                        'name' => 'name',
-                    ),
+                    'name' => 'nuolaida',
                 ),
             ),
             'submit' => array(
