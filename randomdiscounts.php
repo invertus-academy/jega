@@ -13,6 +13,9 @@ class RandomDiscounts extends Module
 
         parent::__construct();
 
+        $this->controllers =['randomdiscounts',
+            ];
+
         $this->displayName = $this->l('Random Discounts');
         $this->description = $this->l('Module that randomizes discounts for you');
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
@@ -73,6 +76,9 @@ class RandomDiscounts extends Module
     }
     public function hookDisplayTop()
     {
-        return '<a href="/Presta/lt/6-accessories">Nuolaidos</a>';
+        $this->context->smarty->assign([
+            "smartykintamasis"=> $this->context->link->getModuleLink($this->name, 'randomdiscounts'),
+        ]);
+        return $this->context->smarty->fetch($this->getLocalPath()."views/templates/front/bandymas.tpl");
     }
 }
