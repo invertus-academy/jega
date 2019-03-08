@@ -30,12 +30,12 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
                         if ($specific == null && $randomSpec == null) {
                             echo "idedam:";
                             echo $randomedItems[$key][$i] . "\n";
-                            $this->AddToTableRandomQuery($randomedItems[$key][$i]);
+                            $this->AddToTableRandomQuery($randomedItems[$key][$i], $dateF, $dateT);
                             $this->AddToTableSpecificQuery($randomedItems[$key][$i], $discount, $dateF, $dateT);
                         } else if ($specific != null && $randomSpec == null) {
                             echo "updatinam specific ir pridedam i random:";
                             echo $randomedItems[$key][$i] . "\n";
-                            $this->AddToTableRandomQuery($randomedItems[$key][$i]);
+                            $this->AddToTableRandomQuery($randomedItems[$key][$i], $dateF, $dateT);
                             $this->UpdateSpecQuery($randomedItems[$key][$i], $discount, $dateF, $dateT);
                         } else
                             $this->UpdateSpecQuery($randomedItems[$key][$i], $discount, $dateF, $dateT);
@@ -222,9 +222,9 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
 
         return Db::getInstance()->execute($sql_query);
     }
-    private function AddToTableRandomQuery($id_product)
+    private function AddToTableRandomQuery($id_product, $dateF, $dateT)
     {
-        $sql_query = "INSERT INTO `ps_random_discounts` (id_random_discount, id_spec_price) VALUE (null, $id_product)";
+        $sql_query = "INSERT INTO `ps_random_discounts` (`id_random_discount`, `id_spec_price`, `from`, `to`) VALUE (null, '$id_product', '$dateF', '$dateT')";
         return Db::getInstance()->execute($sql_query);
     }
     private function UpdateSpecQuery($id_item, $discount, $dateF, $dateT)

@@ -38,6 +38,8 @@ class RandomDiscounts extends Module
         $sql_Query = "CREATE TABLE IF NOT EXISTS "._DB_PREFIX_."random_discounts (
                 `id_random_discount` int(11) NOT NULL AUTO_INCREMENT,
                 `id_spec_price` int(11) NOT NULL,
+                `from` datetime,
+                `to` datetime,
                 PRIMARY KEY(`id_random_discount`)
                 )";
        Db::getInstance()->execute($sql_Query);
