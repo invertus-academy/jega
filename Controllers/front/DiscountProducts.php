@@ -18,6 +18,15 @@ class RandomDiscountsDiscountProductsModuleFrontController extends ModuleFrontCo
         $this->setTemplate('module:randomdiscounts/views/templates/front/page.tpl');
     }
 
+    public function setMedia()
+    {
+        parent::setMedia();
+        $this->registerStylesheet(
+            'random_stylesheet',
+            'modules/'.$this->module->name.'/views/css/button.css'
+        );
+    }
+
     private function GetRandomGeneratedProducts()
     {
 //        $querry = "Select ps_product_lang.name, ps_product_lang.link_rewrite, ps_product.*,  from ((ps_product INNER join ps_random_discounts On ps_product.id_product = ps_random_discounts.id_spec_price) Inner Join ps_product_lang On ps_product.id_product = ps_product_lang.id_product AND ps_product_lang.id_lang = ".$this->context->language->id.")";

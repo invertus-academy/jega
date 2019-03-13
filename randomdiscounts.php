@@ -22,7 +22,8 @@ class RandomDiscounts extends Module
         $this->createTable();
         return parent::install() &&
             $this->registerHook('displayHome') &&
-            $this->registerHook('displayTop');
+            $this->registerHook('displayTop')&&
+            $this->registerHook('displayAdminProductsExtra');
     }
     public function uninstall()
     {
@@ -76,5 +77,10 @@ class RandomDiscounts extends Module
             "smartykintamasis"=> $this->context->link->getModuleLink($this->name, 'DiscountProducts'),
         ]);
         return $this->context->smarty->fetch($this->getLocalPath()."views/templates/front/bandymas.tpl");
+    }
+
+    public function hookDisplayAdminProductsExtra()
+    {
+        return 'Random Discounts';
     }
 }
