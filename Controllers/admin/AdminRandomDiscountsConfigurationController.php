@@ -175,12 +175,14 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
     {
         $result = array();
         $temp1 = 0;
+        $gerosCat = $this->CheckIfCatGotItems($randomedCategories);
 //        var_dump($randomedCategories);
 //        echo "pasibaigia ten rodo jau kita \n";
-        foreach ($randomedCategories as $single) {
-            $list = $this->getCategoryItems(7);
-//            var_dump($list);
-//            die();
+        foreach ($gerosCat as $single) {
+            dump($gerosCat);
+            $list = $this->getCategoryItems($single);
+            dump($list);
+            die();
             if (count($list) > $selectedCount) {
                 //sukame cikla, kol bus uzpilyta skirtingom reiksmem reikiamas kiekis masyve
                 $i =0;
@@ -209,6 +211,20 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
         }
         return $result;
     }
+
+    private function CheckIfCatGotItems($Cat)
+    {
+        for ($i = 0; $i < count($Cat); $i++)
+        {
+            $list = $this->getCategoryItems($Cat[$i]);
+            if(count($list) == 0)
+            {
+                unset($Cat[$i]);
+            }
+        }
+        return $Cat;
+    }
+
     private function SelectSpecificPriceItems($id)
     {
         $querry = "SELECT id_product as product FROM `ps_specific_price`
