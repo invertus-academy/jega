@@ -18,35 +18,40 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
             $randomedCat = $this->getRandomCategories($categories);
             $randomedItems = $this->getRandomItems($randomedCat, $items);
             $padalintaNuolaida = $discount / 100;
-//             var_dump($randomedItems);
-//            die();
+            $numlength = strlen((string)$discount);
+            
+            if (is_numeric($discount) && $numlength > 0 && $numlength < 3 && $this->validateDate($dateF) == 1 && $this->validateDate($dateT) == 1) {
 //          Atsispausdint Itemus kategoriju
-            foreach ($randomedItems as $key => $val) {
-                for ($i = 0; $i < count($randomedItems[$key]); $i++) {
-                    if($randomedItems[$key][$i] != 0) {
-                        $specific = $this->SelectSpecificPriceItems($randomedItems[$key][$i]);
-                        $randomSpec = $this->SelectRandomDiscountsTableItems($randomedItems[$key][$i]);
-                        if ($specific == null && $randomSpec == null) {
-                            echo "idedam:";
-                            echo $randomedItems[$key][$i] . "\n";
-                            $this->AddToTableRandomQuery($randomedItems[$key][$i], $dateF, $dateT);
-                            $this->AddToTableSpecificQuery($randomedItems[$key][$i], $padalintaNuolaida, $dateF, $dateT);
-                        } else if ($specific != null && $randomSpec == null) {
-                            echo "updatinam specific ir pridedam i random:";
-                            echo $randomedItems[$key][$i] . "\n";
-                            $this->AddToTableRandomQuery($randomedItems[$key][$i], $dateF, $dateT);
-                            $this->UpdateSpecQuery($randomedItems[$key][$i], $padalintaNuolaida, $dateF, $dateT);
-                        } else
-                            $this->UpdateSpecQuery($randomedItems[$key][$i], $padalintaNuolaida, $dateF, $dateT);
+                foreach ($randomedItems as $key => $val) {
+                    for ($i = 0; $i < count($randomedItems[$key]); $i++) {
+                        if ($randomedItems[$key][$i] != 0) {
+                            $specific = $this->SelectSpecificPriceItems($randomedItems[$key][$i]);
+                            $randomSpec = $this->SelectRandomDiscountsTableItems($randomedItems[$key][$i]);
+                            if ($specific == null && $randomSpec == null) {
+                                $this->AddToTableRandomQuery($randomedItems[$key][$i], $dateF, $dateT);
+                                $this->AddToTableSpecificQuery($randomedItems[$key][$i], $discount, $dateF, $dateT);
+                            } else if ($specific != null && $randomSpec == null) {
+                                $this->AddToTableRandomQuery($randomedItems[$key][$i], $dateF, $dateT);
+                                $this->UpdateSpecQuery($randomedItems[$key][$i], $discount, $dateF, $dateT);
+                            } else
+                                $this->UpdateSpecQuery($randomedItems[$key][$i], $discount, $dateF, $dateT);
+                        }
                     }
                 }
-                echo "- - - - -";
+                $this->confirmations[] = $this->l('Nuolaidos uždėtos: jos atvaizduotos "Random Discounts" skiltyje jūsų svetainėje');
+            } else {
+                $this->errors[] = $this->l('Klaida: blogai įvesti duomenys');
             }
-            echo "BAIGTA";
+
         }
-
-
     }
+
+    public function validateDate($date, $format = 'Y-m-d H:i:s')
+    {
+        $d = DateTime::createFromFormat($format, $date);
+        return $d && $d->format($format) === $date;
+    }
+
     public function renderOptions()
     {
         $this->fields_form = array(
