@@ -1,4 +1,9 @@
 #card-inline
 {
-    display: inline;
+
+    color: #0a0a0a;
+    align-items: center;
+    width: auto;
+    height: auto;
+    /*display: inline;*/
 }
