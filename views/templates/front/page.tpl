@@ -2,6 +2,7 @@
 {block name="page_content"}
     <h1>{l s="Generated Discounts" mod="randomdiscounts"}</h1>
     {foreach $products as $single}
+        {if $single['to'] > date("Y-m-d H:i:s")}
         <div class="card" id="card-inline" style="width: 18rem;">
             <img class="card-img-top" src="{$single['imgLinkas']}" height="245" width="285" align="center">
             <div class="card-body">
@@ -13,5 +14,6 @@
                 <li class="list-group-item">{l s="Normal Price:" mod="randomdiscounts"} {$single['price_without_reduction']} {l s="Eur" mod="randomdiscounts"}</li>
             </ul>
         </div>
+        {/if}
     {/foreach}
 {/block}

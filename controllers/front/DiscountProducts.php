@@ -37,7 +37,7 @@ class RandomDiscountsDiscountProductsModuleFrontController extends ModuleFrontCo
     {
 //        $querry = "Select ps_product_lang.name, ps_product_lang.link_rewrite, ps_product.*,  from ((ps_product INNER join ps_random_discounts On ps_product.id_product = ps_random_discounts.id_spec_price) Inner Join ps_product_lang On ps_product.id_product = ps_product_lang.id_product AND ps_product_lang.id_lang = ".$this->context->language->id.")";
         $sql = new DbQuery();
-        $sql->select('p.*, product_shop.*, pl.`name`, pl.`link_rewrite`,im.`id_image` as img');
+        $sql->select('rd.`from`, rd.`to`, p.*, product_shop.*, pl.`name`, pl.`link_rewrite`,im.`id_image` as img');
         $sql
             ->from('random_discounts',  'rd')
             ->innerJoin(

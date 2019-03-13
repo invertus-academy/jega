@@ -17,28 +17,37 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
             $dateT = $_POST['date_to'];
             $randomedCat = $this->getRandomCategories($categories);
             $randomedItems = $this->getRandomItems($randomedCat, $items);
+//            dump($randomedItems);
             $numlength = strlen((string)$discount);
-            if (is_numeric($discount) && $numlength > 0 && $numlength < 3 && $this->validateDate($dateF) == 1 && $this->validateDate($dateT) == 1) {
+            if($randomedItems != []) {
+                if (is_numeric($discount) && $numlength > 0 && $numlength < 3 && $this->validateDate($dateF) == 1 && $this->validateDate($dateT) == 1) {
 //          Atsispausdint Itemus kategoriju
-                foreach ($randomedItems as $key => $val) {
-                    for ($i = 0; $i < count($randomedItems[$key]); $i++) {
-                        if ($randomedItems[$key][$i] != 0) {
-                            $specific = $this->SelectSpecificPriceItems($randomedItems[$key][$i]);
-                            $randomSpec = $this->SelectRandomDiscountsTableItems($randomedItems[$key][$i]);
-                            if ($specific == null && $randomSpec == null) {
-                                $this->AddToTableRandomQuery($randomedItems[$key][$i], $dateF, $dateT);
-                                $this->AddToTableSpecificQuery($randomedItems[$key][$i], $tempNuol, $dateF, $dateT);
-                            } else if ($specific != null && $randomSpec == null) {
-                                $this->AddToTableRandomQuery($randomedItems[$key][$i], $dateF, $dateT);
-                                $this->UpdateSpecQuery($randomedItems[$key][$i], $tempNuol, $dateF, $dateT);
-                            } else
-                                $this->UpdateSpecQuery($randomedItems[$key][$i], $tempNuol, $dateF, $dateT);
+                    foreach ($randomedItems as $key => $val) {
+//                        dump($val);
+                        foreach ($val as $item){
+//                            dump($item);
+                            if ($item != 0) {
+                                $specific = $this->SelectSpecificPriceItems($item);
+                                $randomSpec = $this->SelectRandomDiscountsTableItems($item);
+                                if ($specific == null && $randomSpec == null) {
+                                    $this->AddToTableRandomQuery($item, $dateF, $dateT);
+                                    $this->AddToTableSpecificQuery($item, $tempNuol, $dateF, $dateT);
+                                } else if ($specific != null && $randomSpec == null) {
+                                    $this->AddToTableRandomQuery($item, $dateF, $dateT);
+                                    $this->UpdateSpecQuery($item, $tempNuol, $dateF, $dateT);
+                                } else
+                                    $this->UpdateSpecQuery($item, $tempNuol, $dateF, $dateT);
+                            }
                         }
                     }
+//                    die();
+                    $this->confirmations[] = $this->l('Nuolaidos uždėtos: jos atvaizduotos "Random Discounts" skiltyje jūsų svetainėje');
+                } else {
+                    $this->errors[] = $this->l('Klaida: blogai įvesti duomenys');
                 }
-                $this->confirmations[] = $this->l('Nuolaidos uždėtos: jos atvaizduotos "Random Discounts" skiltyje jūsų svetainėje');
-            } else {
-                $this->errors[] = $this->l('Klaida: blogai įvesti duomenys');
+            }else
+            {
+                $this->errors[] = $this->l('Atsiprasome,taciau atsitiktinai pasirinkta kategorija, neturejo produktu');
             }
         }
     }
@@ -171,34 +180,37 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
         $result = array();
         $temp1 = 0;
         $this->CheckIfCatGotItems($randomedCategories);
-        dump($randomedCategories);
-        die();
-//        echo "pasibaigia ten rodo jau kita \n";
-        foreach ($gerosCat as $single) {
-            $list = $this->getCategoryItems($single);
+        $i =0;
+        if($randomedCategories != []) {
+            foreach ($randomedCategories as $single) {
+//                dump($randomedCategories);
+                $list = $this->getCategoryItems($single);
 //            dump($list);
 //            die();
-            if (count($list) > $selectedCount) {
-                //sukame cikla, kol bus uzpilyta skirtingom reiksmem reikiamas kiekis masyve
-                $i =0;
-                while (count($result) != $selectedCount) {
-                    $temp = array_rand($list);
-                   // var_dump($list[$temp]);
-                    //die();
-                    //Jeigu sugalvoto random skaiciaus dar nera prideje i masyva tuomet ji pridedam, kad nebutu vienodu produktu.
-                    $result[$temp1][$i] = $list[$temp]['produktai'];
-                    $i = $i + 1;
-                    unset($list[$temp]);
-                }
-            } else {
+                if (count($list) > $selectedCount) {
+                    //sukame cikla, kol bus uzpilyta skirtingom reiksmem reikiamas kiekis masyve
+                    if (!isset($result[$temp1])) {
+                        $temp = array_rand($list);
+                        $result[$temp1][$i] = $list[$temp]['produktai'];
+                        $i = $i + 1;
+                    }
+                    while (count($result[$temp1]) != $selectedCount) {
+                        $temp = array_rand($list);
+                        //Jeigu sugalvoto random skaiciaus dar nera prideje i masyva tuomet ji pridedam, kad nebutu vienodu produktu.
+                        if (!in_array($list[$temp]['produktai'], $result[$temp1])) {
+                            $result[$temp1][$i] = $list[$temp]['produktai'];
+                            $i = $i + 1;
+                        }
+                    }
+                } else {
 //                Jeigu Itemu yra maziau negu pasirinko vartotojas, tuomet sudedame visus itemus
-                $temp = 0;
-                foreach ($list as $val) {
-                    $result[$temp1][$temp] = $val['produktai'];
-                    $temp = $temp + 1;
+                    foreach ($list as $val) {
+                        $result[$temp1][$i] = $val['produktai'];
+                        $i++;
+                    }
                 }
+                $temp1 = $temp1 + 1;
             }
-            $temp1 = $temp1 + 1;
         }
         return $result;
     }
