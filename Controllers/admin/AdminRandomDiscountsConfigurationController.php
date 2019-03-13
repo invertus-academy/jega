@@ -18,28 +18,30 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
             $dateT = $_POST['date_to'];
             $randomedCat = $this->getRandomCategories($categories);
             $randomedItems = $this->getRandomItems($randomedCat, $items);
-            dump($randomedItems);
-            die();
+//            dump($randomedItems);
             $numlength = strlen((string)$discount);
             if($randomedItems != []) {
                 if (is_numeric($discount) && $numlength > 0 && $numlength < 3 && $this->validateDate($dateF) == 1 && $this->validateDate($dateT) == 1) {
 //          Atsispausdint Itemus kategoriju
                     foreach ($randomedItems as $key => $val) {
-                        for ($i = 0; $i < count($randomedItems[$key]); $i++) {
-                            if ($randomedItems[$key][$i] != 0) {
-                                $specific = $this->SelectSpecificPriceItems($randomedItems[$key][$i]);
-                                $randomSpec = $this->SelectRandomDiscountsTableItems($randomedItems[$key][$i]);
+//                        dump($val);
+                        foreach ($val as $item){
+//                            dump($item);
+                            if ($item != 0) {
+                                $specific = $this->SelectSpecificPriceItems($item);
+                                $randomSpec = $this->SelectRandomDiscountsTableItems($item);
                                 if ($specific == null && $randomSpec == null) {
-                                    $this->AddToTableRandomQuery($randomedItems[$key][$i], $dateF, $dateT);
-                                    $this->AddToTableSpecificQuery($randomedItems[$key][$i], $tempNuol, $dateF, $dateT);
+                                    $this->AddToTableRandomQuery($item, $dateF, $dateT);
+                                    $this->AddToTableSpecificQuery($item, $tempNuol, $dateF, $dateT);
                                 } else if ($specific != null && $randomSpec == null) {
-                                    $this->AddToTableRandomQuery($randomedItems[$key][$i], $dateF, $dateT);
-                                    $this->UpdateSpecQuery($randomedItems[$key][$i], $tempNuol, $dateF, $dateT);
+                                    $this->AddToTableRandomQuery($item, $dateF, $dateT);
+                                    $this->UpdateSpecQuery($item, $tempNuol, $dateF, $dateT);
                                 } else
-                                    $this->UpdateSpecQuery($randomedItems[$key][$i], $tempNuol, $dateF, $dateT);
+                                    $this->UpdateSpecQuery($item, $tempNuol, $dateF, $dateT);
                             }
                         }
                     }
+//                    die();
                     $this->confirmations[] = $this->l('Nuolaidos uždėtos: jos atvaizduotos "Random Discounts" skiltyje jūsų svetainėje');
                 } else {
                     $this->errors[] = $this->l('Klaida: blogai įvesti duomenys');
@@ -182,9 +184,6 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
         $result = array();
         $temp1 = 0;
         $this->CheckIfCatGotItems($randomedCategories);
-//        dump($randomedCategories);
-//        die();
-//        echo "pasibaigia ten rodo jau kita \n";
         $i =0;
         if($randomedCategories != []) {
             foreach ($randomedCategories as $single) {
@@ -201,11 +200,6 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
                     }
                     while (count($result[$temp1]) != $selectedCount) {
                         $temp = array_rand($list);
-//                        dump($list[$temp]['produktai']);
-//                        $result[$temp1][$i] = $list[$temp]['produktai'];
-//                        $i = $i + 1;
-//                        dump(!in_array($list[$temp]['produktai'], $result[$temp1]));
-
                         //Jeigu sugalvoto random skaiciaus dar nera prideje i masyva tuomet ji pridedam, kad nebutu vienodu produktu.
                         if (!in_array($list[$temp]['produktai'], $result[$temp1])) {
                             $result[$temp1][$i] = $list[$temp]['produktai'];
@@ -216,6 +210,7 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
 //                Jeigu Itemu yra maziau negu pasirinko vartotojas, tuomet sudedame visus itemus
                     foreach ($list as $val) {
                         $result[$temp1][$i] = $val['produktai'];
+                        $i++;
                     }
                 }
                 $temp1 = $temp1 + 1;
