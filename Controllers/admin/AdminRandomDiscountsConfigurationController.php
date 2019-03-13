@@ -11,15 +11,15 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
     {
         if (isset($_POST["submitAddconfiguration"])) {
             $discount = $_POST['nuolaida'];
+            $tempNuol = $discount / 100;
             $categories = $_POST['categ'];
             $items = $_POST['prekes'];
             $dateF = $_POST['date_from'];
             $dateT = $_POST['date_to'];
             $randomedCat = $this->getRandomCategories($categories);
             $randomedItems = $this->getRandomItems($randomedCat, $items);
-            $padalintaNuolaida = $discount / 100;
             $numlength = strlen((string)$discount);
-            
+
             if (is_numeric($discount) && $numlength > 0 && $numlength < 3 && $this->validateDate($dateF) == 1 && $this->validateDate($dateT) == 1) {
 //          Atsispausdint Itemus kategoriju
                 foreach ($randomedItems as $key => $val) {
@@ -29,12 +29,12 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
                             $randomSpec = $this->SelectRandomDiscountsTableItems($randomedItems[$key][$i]);
                             if ($specific == null && $randomSpec == null) {
                                 $this->AddToTableRandomQuery($randomedItems[$key][$i], $dateF, $dateT);
-                                $this->AddToTableSpecificQuery($randomedItems[$key][$i], $discount, $dateF, $dateT);
+                                $this->AddToTableSpecificQuery($randomedItems[$key][$i], $tempNuol, $dateF, $dateT);
                             } else if ($specific != null && $randomSpec == null) {
                                 $this->AddToTableRandomQuery($randomedItems[$key][$i], $dateF, $dateT);
-                                $this->UpdateSpecQuery($randomedItems[$key][$i], $discount, $dateF, $dateT);
+                                $this->UpdateSpecQuery($randomedItems[$key][$i], $tempNuol, $dateF, $dateT);
                             } else
-                                $this->UpdateSpecQuery($randomedItems[$key][$i], $discount, $dateF, $dateT);
+                                $this->UpdateSpecQuery($randomedItems[$key][$i], $tempNuol, $dateF, $dateT);
                         }
                     }
                 }

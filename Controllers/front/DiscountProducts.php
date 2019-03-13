@@ -11,7 +11,14 @@ class RandomDiscountsDiscountProductsModuleFrontController extends ModuleFrontCo
     {
         parent::initContent();
         $productList = $this->GetRandomGeneratedProducts();
-
+        //Generuojam img linka
+        foreach ($productList as &$item)
+        {
+            $item['imgLinkas'] = $this->context->link->getImageLink($item["link_rewrite"], $item['img']);
+            $item['specific_prices']['reduction'] = $item['specific_prices']['reduction'] * 100;
+        }
+//        dump($productList);
+//        die;
         $this->context->smarty->assign(array(
             'products' => $productList,
         ));
@@ -25,6 +32,8 @@ class RandomDiscountsDiscountProductsModuleFrontController extends ModuleFrontCo
             'random_stylesheet',
             'modules/'.$this->module->name.'/views/css/button.css'
         );
+        $this->registerStylesheet('page_sheet',
+            'modules/'.$this->module->name.'/views/css/page.css');
     }
 
     private function GetRandomGeneratedProducts()
@@ -33,7 +42,7 @@ class RandomDiscountsDiscountProductsModuleFrontController extends ModuleFrontCo
         $sql = new DbQuery();
 
 
-        $sql->select('p.*, product_shop.*, pl.`name`, pl.`link_rewrite`,im.`cover`');
+        $sql->select('p.*, product_shop.*, pl.`name`, pl.`link_rewrite`,im.`id_image` as img');
         $sql
             ->from('random_discounts',  'rd')
             ->innerJoin(
@@ -48,9 +57,9 @@ class RandomDiscountsDiscountProductsModuleFrontController extends ModuleFrontCo
                 ' AND pl.`id_shop`=' . $this->context->shop->id
             )
             ->innerJoin(
-                'image_shop',
+                'image',
                 'im',
-                'im.`id_product`=rd.`id_spec_price` AND im.`id_shop` ='. $this->context->shop->id
+                'im.`id_product`=rd.`id_spec_price`'
             )
             ->join(Shop::addSqlAssociation('product', 'p'));
 
