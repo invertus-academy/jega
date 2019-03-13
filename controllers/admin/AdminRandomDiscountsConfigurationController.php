@@ -10,43 +10,46 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
     public function postProcess()
     {
         if (isset($_POST["submitAddconfiguration"])) {
-            $discount = $_POST['nuolaida'] / 100;
+            $discount = $_POST['nuolaida'];
             $categories = $_POST['categ'];
             $items = $_POST['prekes'];
             $dateF = $_POST['date_from'];
             $dateT = $_POST['date_to'];
             $randomedCat = $this->getRandomCategories($categories);
             $randomedItems = $this->getRandomItems($randomedCat, $items);
+            $numlength = strlen((string)$discount);
 
-            // var_dump($randomedItems);
-            // echo "asdoasdasd";
-
+            if(is_numeric($discount) && $numlength > 0 && $numlength <3 && $this->validateDate($dateF) == 1 && $this->validateDate($dateT) == 1) {
 //          Atsispausdint Itemus kategoriju
-            foreach ($randomedItems as $key => $val) {
-                for ($i = 0; $i < count($randomedItems[$key]); $i++) {
-                    if($randomedItems[$key][$i] != 0) {
-                        $specific = $this->SelectSpecificPriceItems($randomedItems[$key][$i]);
-                        $randomSpec = $this->SelectRandomDiscountsTableItems($randomedItems[$key][$i]);
-                        if ($specific == null && $randomSpec == null) {
-                            echo "idedam:";
-                            echo $randomedItems[$key][$i] . "\n";
-                            $this->AddToTableRandomQuery($randomedItems[$key][$i], $dateF, $dateT);
-                            $this->AddToTableSpecificQuery($randomedItems[$key][$i], $discount, $dateF, $dateT);
-                        } else if ($specific != null && $randomSpec == null) {
-                            echo "updatinam specific ir pridedam i random:";
-                            echo $randomedItems[$key][$i] . "\n";
-                            $this->AddToTableRandomQuery($randomedItems[$key][$i], $dateF, $dateT);
-                            $this->UpdateSpecQuery($randomedItems[$key][$i], $discount, $dateF, $dateT);
-                        } else
-                            $this->UpdateSpecQuery($randomedItems[$key][$i], $discount, $dateF, $dateT);
+                foreach ($randomedItems as $key => $val) {
+                    for ($i = 0; $i < count($randomedItems[$key]); $i++) {
+                        if ($randomedItems[$key][$i] != 0) {
+                            $specific = $this->SelectSpecificPriceItems($randomedItems[$key][$i]);
+                            $randomSpec = $this->SelectRandomDiscountsTableItems($randomedItems[$key][$i]);
+                            if ($specific == null && $randomSpec == null) {
+                                $this->AddToTableRandomQuery($randomedItems[$key][$i], $dateF, $dateT);
+                                $this->AddToTableSpecificQuery($randomedItems[$key][$i], $discount, $dateF, $dateT);
+                            } else if ($specific != null && $randomSpec == null) {
+                                $this->AddToTableRandomQuery($randomedItems[$key][$i], $dateF, $dateT);
+                                $this->UpdateSpecQuery($randomedItems[$key][$i], $discount, $dateF, $dateT);
+                            } else
+                                $this->UpdateSpecQuery($randomedItems[$key][$i], $discount, $dateF, $dateT);
+                        }
                     }
                 }
-                echo "- - - - -";
+                $this->confirmations[] = $this->l('Nuolaidos uždėtos: jos atvaizduotos "Random Discounts" skiltyje jūsų svetainėje');
             }
-            echo "BAIGTA";
+            else {
+                $this->errors[] = $this->l('Klaida: blogai įvesti duomenys');
+            }
         }
     }
+    public function validateDate($date, $format = 'Y-m-d H:i:s')
+    {
+        $d = DateTime::createFromFormat($format, $date);
 
+        return $d && $d->format($format) === $date;
+    }
 
     public function renderOptions()
     {
@@ -218,7 +221,7 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
                       `id_shop_group`, `id_currency`, `id_country`, `id_group`, `id_customer`, `id_product_attribute`, `price`,
                       `from_quantity`, `reduction`, `reduction_tax`, `reduction_type`, `from`, `to`) 
                       VALUES (null, '0', '0', '$id_product', '1', '0', '0', '0', '0', '0', '0', '-1.000000', '1',
-                       '$discount', '1', 'percentage', '$dateF', '$dateT');";
+                       '$discount / 100', '1', 'percentage', '$dateF', '$dateT');";
 
         return Db::getInstance()->execute($sql_query);
     }
@@ -230,7 +233,7 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
     private function UpdateSpecQuery($id_item, $discount, $dateF, $dateT)
     {
         $sql_query = "UPDATE `ps_specific_price` 
-                      SET `reduction` = $discount, `from` = '$dateF', `to` = '$dateT' WHERE id_product = $id_item";
+                      SET `reduction` = $discount / 100, `from` = '$dateF', `to` = '$dateT' WHERE id_product = $id_item";
         return Db::getInstance()->execute($sql_query);
     }
 }

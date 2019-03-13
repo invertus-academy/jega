@@ -6,7 +6,7 @@
                       <i class="material-icons remove">&#xE316;</i>
                     </span>
                   </span>
-    {l s='Discount' mod='randomdiscounts'}</a>
+    {l s='"Random Discounts"' mod='randomdiscounts'}</a>
     </ul>
     <div class="clearfix"></div>
 </div>
