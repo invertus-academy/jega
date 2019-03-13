@@ -175,14 +175,14 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
     {
         $result = array();
         $temp1 = 0;
-        $gerosCat = $this->CheckIfCatGotItems($randomedCategories);
-//        var_dump($randomedCategories);
+        $this->CheckIfCatGotItems($randomedCategories);
+        dump($randomedCategories);
+        die();
 //        echo "pasibaigia ten rodo jau kita \n";
         foreach ($gerosCat as $single) {
-            dump($gerosCat);
             $list = $this->getCategoryItems($single);
-            dump($list);
-            die();
+//            dump($list);
+//            die();
             if (count($list) > $selectedCount) {
                 //sukame cikla, kol bus uzpilyta skirtingom reiksmem reikiamas kiekis masyve
                 $i =0;
@@ -196,23 +196,20 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
                         $i = $i + 1;
                     }
                 }
-            } else if (count($list) != 0){
+            } else {
 //                Jeigu Itemu yra maziau negu pasirinko vartotojas, tuomet sudedame visus itemus
                 $temp = 0;
                 foreach ($list as $val) {
                         $result[$temp1][$temp] = $val['produktai'];
                         $temp = $temp + 1;
                 }
-            } else
-            {
-                $result[$temp1][0] = 0;
             }
             $temp1 = $temp1 + 1;
         }
         return $result;
     }
 
-    private function CheckIfCatGotItems($Cat)
+    private function CheckIfCatGotItems(&$Cat)
     {
         for ($i = 0; $i < count($Cat); $i++)
         {
