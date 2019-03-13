@@ -11,6 +11,8 @@ class RandomDiscounts extends Module
         $this->tab = 'front_office_features';
         $this->version = '1.0.0';
         parent::__construct();
+        $this->controllers =['randomdiscounts',
+        ];
         $this->displayName = $this->l('Random Discounts');
         $this->description = $this->l('Module that randomizes discounts for you');
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
@@ -32,6 +34,8 @@ class RandomDiscounts extends Module
         $sql_Query = "CREATE TABLE IF NOT EXISTS "._DB_PREFIX_."random_discounts (
                 `id_random_discount` int(11) NOT NULL AUTO_INCREMENT,
                 `id_spec_price` int(11) NOT NULL,
+                `from` datetime,
+                `to` datetime,
                 PRIMARY KEY(`id_random_discount`)
                 )";
         Db::getInstance()->execute($sql_Query);
@@ -68,6 +72,9 @@ class RandomDiscounts extends Module
     }
     public function hookDisplayTop()
     {
-        return '<a href="/Presta/lt/6-accessories">Nuolaidos</a>';
+        $this->context->smarty->assign([
+            "smartykintamasis"=> $this->context->link->getModuleLink($this->name, 'DiscountProducts'),
+        ]);
+        return $this->context->smarty->fetch($this->getLocalPath()."views/templates/front/bandymas.tpl");
     }
 }

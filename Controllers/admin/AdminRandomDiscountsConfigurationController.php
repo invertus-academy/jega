@@ -6,10 +6,10 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
         $this->bootstrap=true;
         parent::__construct();
     }
+
     public function postProcess()
     {
-        if(isset($_POST["submitAddconfiguration"]))
-        {
+        if (isset($_POST["submitAddconfiguration"])) {
             $discount = $_POST['nuolaida'];
             $categories = $_POST['categ'];
             $items = $_POST['prekes'];
@@ -17,18 +17,35 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
             $dateT = $_POST['date_to'];
             $randomedCat = $this->getRandomCategories($categories);
             $randomedItems = $this->getRandomItems($randomedCat, $items);
-//            Atsispausdint Itemus kategoriju
-//            foreach ($randomedItems as $key=>$val)
-//            {
-//                for($i = 0; $i < count($randomedItems[$key]);$i++)
-//                {
-//                    echo $randomedItems[$key][$i]."\n";
-//                }
-//                echo "- - - - -";
-//            }
+            $padalintaNuolaida = $discount / 100;
+//             var_dump($randomedItems);
 //            die();
-
+//          Atsispausdint Itemus kategoriju
+            foreach ($randomedItems as $key => $val) {
+                for ($i = 0; $i < count($randomedItems[$key]); $i++) {
+                    if($randomedItems[$key][$i] != 0) {
+                        $specific = $this->SelectSpecificPriceItems($randomedItems[$key][$i]);
+                        $randomSpec = $this->SelectRandomDiscountsTableItems($randomedItems[$key][$i]);
+                        if ($specific == null && $randomSpec == null) {
+                            echo "idedam:";
+                            echo $randomedItems[$key][$i] . "\n";
+                            $this->AddToTableRandomQuery($randomedItems[$key][$i], $dateF, $dateT);
+                            $this->AddToTableSpecificQuery($randomedItems[$key][$i], $padalintaNuolaida, $dateF, $dateT);
+                        } else if ($specific != null && $randomSpec == null) {
+                            echo "updatinam specific ir pridedam i random:";
+                            echo $randomedItems[$key][$i] . "\n";
+                            $this->AddToTableRandomQuery($randomedItems[$key][$i], $dateF, $dateT);
+                            $this->UpdateSpecQuery($randomedItems[$key][$i], $padalintaNuolaida, $dateF, $dateT);
+                        } else
+                            $this->UpdateSpecQuery($randomedItems[$key][$i], $padalintaNuolaida, $dateF, $dateT);
+                    }
+                }
+                echo "- - - - -";
+            }
+            echo "BAIGTA";
         }
+
+
     }
     public function renderOptions()
     {
@@ -64,12 +81,12 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
                     'name' => 'nuolaida',
                 ),
                 array(
-                    'type' => 'date',
+                    'type' => 'datetime',
                     'label' => 'Data: Nuo',
                     'name' => 'date_from',
                 ),
                 array(
-                    'type' => 'date',
+                    'type' => 'datetime',
                     'label' => 'Data: Iki',
                     'name' => 'date_to',
                 )
@@ -92,6 +109,12 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
 //    }
     private function getCategCount()
     {
+        $querry = "SELECT Count(id_category) as kiekis FROM `ps_category`";
+        $kiek = Db::getInstance()->executeS($querry);
+        return $kiek[0]["kiekis"];
+    }
+    private function getActiveCategCount()
+    {
         $querry = "SELECT Count(id_category) as kiekis FROM `ps_category` 
                    WHERE id_category != 1
                    AND id_category != 2";
@@ -100,7 +123,7 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
     }
     private function getCategSelectArray()
     {
-        $numb = $this::getCategCount();
+        $numb = $this::getActiveCategCount();
         $result = array();
         for($i = 0; $i < $numb; $i++)
         {
@@ -126,9 +149,9 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
         $result = array();
         $categories = $this->getCategCount();
         $i = 0;
-       while(count($result) != $selectedCountCat)
-       {
-            $rand = rand(4, $categories);
+        while(count($result) != $selectedCountCat)
+        {
+            $rand = rand(3, $categories);
             if(!in_array($rand,$result)) {
                 $result[$i] = $rand;
                 $i= $i + 1;
@@ -150,32 +173,72 @@ class AdminRandomDiscountsConfigurationController extends ModuleAdminController
 //        var_dump($randomedCategories);
 //        echo "pasibaigia ten rodo jau kita \n";
         foreach ($randomedCategories as $single) {
-            $list = $this->getCategoryItems($single);
+            $list = $this->getCategoryItems(7);
+//            var_dump($list);
+//            die();
             if (count($list) > $selectedCount) {
-                    //sukame cikla, kol bus uzpilyta skirtingom reiksmem reikiamas kiekis masyve
-                    $i =0;
-                    while (count($result) != $selectedCount) {
-                        $temp = array_rand($list);
-                        //Jeigu sugalvoto random skaiciaus dar nera prideje i masyva tuomet ji pridedam, kad nebutu vienodu produktu.
-                        if (!in_array($list[$temp]['produktai'], $result[$temp1])) {
-                            $result[$temp1][$i] = $list[$temp]['produktai'];
-                            $i = $i + 1;
-                        }
+                //sukame cikla, kol bus uzpilyta skirtingom reiksmem reikiamas kiekis masyve
+                $i =0;
+                while (count($result) != $selectedCount) {
+                    $temp = array_rand($list);
+                    var_dump($list[$temp]);
+                    die();
+                    //Jeigu sugalvoto random skaiciaus dar nera prideje i masyva tuomet ji pridedam, kad nebutu vienodu produktu.
+                    if (!in_array($list[$temp]['produktai'], $result[$temp1])) {
+                        $result[$temp1][$i] = $list[$temp]['produktai'];
+                        $i = $i + 1;
                     }
+                }
             } else if (count($list) != 0){
 //                Jeigu Itemu yra maziau negu pasirinko vartotojas, tuomet sudedame visus itemus
                 $temp = 0;
                 foreach ($list as $val) {
-                    $result[$temp1][$temp] = $val['produktai'];
-                    $temp = $temp + 1;
+                        $result[$temp1][$temp] = $val['produktai'];
+                        $temp = $temp + 1;
                 }
             } else
             {
                 $result[$temp1][0] = 0;
             }
-
             $temp1 = $temp1 + 1;
         }
         return $result;
     }
+    private function SelectSpecificPriceItems($id)
+    {
+        $querry = "SELECT id_product as product FROM `ps_specific_price`
+                    WHERE id_product = $id ";
+        $result = Db::getInstance()->executeS($querry);
+        return $result;
+    }
+    private function SelectRandomDiscountsTableItems($id)
+    {
+        $querry = "SELECT id_spec_price as spec FROM `ps_random_discounts`
+                    WHERE id_spec_price = $id";
+        $result = Db::getInstance()->executeS($querry);
+        return $result;
+    }
+    private function AddToTableSpecificQuery($id_product, $discount, $dateF, $dateT)
+    {
+        $sql_query = "INSERT INTO `ps_specific_price` (`id_specific_price`, `id_specific_price_rule`, `id_cart`, `id_product`, `id_shop`,
+                      `id_shop_group`, `id_currency`, `id_country`, `id_group`, `id_customer`, `id_product_attribute`, `price`,
+                      `from_quantity`, `reduction`, `reduction_tax`, `reduction_type`, `from`, `to`) 
+                      VALUES (null, '0', '0', '$id_product', '1', '0', '0', '0', '0', '0', '0', '-1.000000', '1',
+                       '$discount', '1', 'percentage', '$dateF', '$dateT');";
+        return Db::getInstance()->execute($sql_query);
+    }
+    private function AddToTableRandomQuery($id_product, $dateF, $dateT)
+    {
+        $sql_query = "INSERT INTO `ps_random_discounts` (`id_random_discount`, `id_spec_price`, `from`, `to`) VALUE (null, '$id_product', '$dateF', '$dateT')";
+        return Db::getInstance()->execute($sql_query);
+    }
+    private function UpdateSpecQuery($id_item, $discount, $dateF, $dateT)
+    {
+        $sql_query = "UPDATE `ps_specific_price` 
+                      SET `reduction` = $discount, `from` = '$dateF', `to` = '$dateT' WHERE id_product = $id_item";
+        return Db::getInstance()->execute($sql_query);
+    }
+
+
+
 }
