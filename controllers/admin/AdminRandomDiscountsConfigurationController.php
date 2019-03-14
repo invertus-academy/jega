@@ -1,6 +1,15 @@
 <?php
 class AdminRandomDiscountsConfigurationController extends ModuleAdminController
 {
+    public function setMedia($isNewTheme = false)
+    {
+        parent::setMedia($isNewTheme);
+
+        $this->addCSS(
+            $this->module->getLocalPath().'/views/css/admincss.css'
+        );
+    }
+
     public function  __construct()
     {
         $this->bootstrap=true;

@@ -13,13 +13,16 @@ class RandomDiscountsDiscountProductsModuleFrontController extends ModuleFrontCo
         //Generuojam img linka
         foreach ($productList as &$item)
         {
-            $item['imgLinkas'] = $this->context->link->getImageLink($item["link_rewrite"], $item['img']);
+            $item['imgLinkas'] = $this->context->link->getImageLink($item["link_rewrite"], $item['img'], 'home_default');
             $item['specific_prices']['reduction'] = $item['specific_prices']['reduction'] * 100;
+            $item['kaina']= $item['price_without_reduction'] - ($item['price_without_reduction'] / 100 * $item['specific_prices']['reduction']);
+            $item['kaina'] = Tools::displayPrice($item['kaina']);
         }
 //        dump($productList);
 //        die;
         $this->context->smarty->assign(array(
             'products' => $productList,
+            'currency' => $this->context->currency->iso_code,
         ));
         $this->setTemplate('module:randomdiscounts/views/templates/front/page.tpl');
     }
